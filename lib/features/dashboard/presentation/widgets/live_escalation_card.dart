@@ -3,7 +3,16 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class LiveEscalationCard extends StatelessWidget {
-  const LiveEscalationCard({super.key});
+  final String title;
+  final String severity;
+  final VoidCallback onAcknowledge;
+
+  const LiveEscalationCard({
+    super.key,
+    required this.title,
+    required this.severity,
+    required this.onAcknowledge,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,30 +92,30 @@ class LiveEscalationCard extends StatelessWidget {
                       color: Colors.black.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'TASK TASK-001 - Weapon Threat',
-                          style: TextStyle(
+                          title,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Electronics Zone • Tier 4 Emergency',
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Zone A • Tier 4 Emergency',
                           style: TextStyle(color: Colors.white60, fontSize: 13),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         '0:20 ELAPSED',
                         style: TextStyle(
                           color: Colors.white,
@@ -116,8 +125,8 @@ class LiveEscalationCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'CRITICAL',
-                        style: TextStyle(
+                        severity.toUpperCase(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
                           fontSize: 12,
@@ -144,9 +153,7 @@ class LiveEscalationCard extends StatelessWidget {
                           label: 'ACKNOWLEDGE',
                           color: Colors.white,
                           textColor: AppColors.modernBlue,
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                          },
+                          onPressed: onAcknowledge,
                         ),
                       ),
                       const SizedBox(width: 12),

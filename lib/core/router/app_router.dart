@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../injection/injection_container.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
+import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import '../../features/dashboard/presentation/bloc/dashboard_event.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/tasks/presentation/pages/tasks_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
@@ -57,7 +60,10 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/dashboard',
-            builder: (context, state) => const DashboardPage(),
+            builder: (context, state) => BlocProvider(
+              create: (context) => sl<DashboardBloc>()..add(LoadDashboard()),
+              child: const DashboardPage(),
+            ),
           ),
           GoRoute(
             path: '/tasks',
