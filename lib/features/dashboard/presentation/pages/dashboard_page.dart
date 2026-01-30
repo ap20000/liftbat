@@ -214,8 +214,10 @@ class _DashboardPageState extends State<DashboardPage> {
                       title: 'System Status',
                       value: analytics.systemUptime > 0
                           ? '${analytics.systemUptime.toStringAsFixed(1)}%'
-                          : '99.8%',
-                      subtitle: 'All Systems Online',
+                          : 'N/A',
+                      subtitle: analytics.systemUptime > 0
+                          ? 'Systems Online'
+                          : 'Systems Offline',
                       icon: Icons.bar_chart_rounded,
                       iconColor: Colors.grey,
                       onTap: null,
@@ -302,26 +304,16 @@ class _DashboardPageState extends State<DashboardPage> {
                               ],
                             ),
                           )
-                    else ...[
-                      _buildReportItem(
-                        title: 'Weapon Threat Report',
-                        subtitle:
-                            'Electronics zone weapon detection - sent to police',
-                        meta: '2 recipients • Acknowledged',
-                        badge: 'CRITICAL',
-                        badgeColor: const Color(0xFFFFEBEE),
-                        textColor: const Color(0xFFC62828),
+                    else
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'No Critical Reports',
+                            style: TextStyle(color: Colors.black38),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      _buildReportItem(
-                        title: 'Theft Investigation',
-                        subtitle: 'High-value theft report - insurance claim',
-                        meta: '3 recipients • Pending',
-                        badge: 'HIGH',
-                        badgeColor: const Color(0xFFFFF3E0),
-                        textColor: const Color(0xFFEF6C00),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -369,27 +361,16 @@ class _DashboardPageState extends State<DashboardPage> {
                               ],
                             ),
                           )
-                    else ...[
-                      _buildIncidentListItem(
-                        id: 'INC-001',
-                        title: 'Weapon Threat Detection',
-                        subtitle: 'Security Team Alpha',
-                        time: '5m ago',
-                        badge: 'CRITICAL',
-                        badgeColor: const Color(0xFFFFEBEE),
-                        textColor: const Color(0xFFC62828),
+                    else
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'No Active Incidents',
+                            style: TextStyle(color: Colors.black38),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      _buildIncidentListItem(
-                        id: 'INC-002',
-                        title: 'Theft Investigation',
-                        subtitle: 'LP Manager',
-                        time: '30m ago',
-                        badge: 'HIGH',
-                        badgeColor: const Color(0xFFFFF3E0),
-                        textColor: const Color(0xFFEF6C00),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -424,91 +405,89 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _showEmergencyActions(BuildContext context) {
+    final dashboardBloc = context.read<DashboardBloc>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(2),
+      builder: (sheetContext) => BlocProvider.value(
+        value: dashboardBloc,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Security Emergency Center'.toUpperCase(),
-              style: TextStyle(
-                color: Colors.indigo[900],
-                fontWeight: FontWeight.w900,
-                fontSize: 16,
-                letterSpacing: 1.2,
+              const SizedBox(height: 24),
+              Text(
+                'Security Emergency Center'.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.indigo[900],
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'AUTHORIZED PERSONNEL ONLY',
-              style: TextStyle(
+              const SizedBox(height: 8),
+              const Text(
+                'AUTHORIZED PERSONNEL ONLY',
+                style: TextStyle(
+                  color: AppColors.critical,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 32),
+              _EmergencyActionTile(
+                title: 'Manual Trigger Escalation',
+                subtitle: 'Initiate global security matrix override',
+                icon: Icons.emergency_share_rounded,
+                color: AppColors.primary,
+                onTap: () {
+                  context.push('/escalation/manual');
+                  Navigator.pop(sheetContext);
+                },
+              ),
+              const SizedBox(height: 16),
+              _EmergencyActionTile(
+                title: 'Immediate Stop Escalation',
+                subtitle: 'Suppress all active alert propagation',
+                icon: Icons.stop_circle_rounded,
                 color: AppColors.critical,
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
-                letterSpacing: 1,
+                onTap: () {
+                  dashboardBloc.add(StopEscalationRequested());
+                  Navigator.pop(sheetContext);
+                },
               ),
-            ),
-            const SizedBox(height: 32),
-            _EmergencyActionTile(
-              title: 'Manual Trigger Escalation',
-              subtitle: 'Initiate global security matrix override',
-              icon: Icons.emergency_share_rounded,
-              color: AppColors.primary,
-              onTap: () {
-                context.read<DashboardBloc>().add(
-                  const TriggerEscalationRequested('MANUAL-001'),
-                );
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 16),
-            _EmergencyActionTile(
-              title: 'Immediate Stop Escalation',
-              subtitle: 'Suppress all active alert propagation',
-              icon: Icons.stop_circle_rounded,
-              color: AppColors.critical,
-              onTap: () {
-                context.read<DashboardBloc>().add(StopEscalationRequested());
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEscalationBanner(List<Escalation> activeEscalations) {
-    final escalation = activeEscalations.isNotEmpty
-        ? activeEscalations.first
-        : Escalation(
-            id: 'INC-001',
-            title: 'Weapon Threat - Electronics Zone',
-            severity: 'CRITICAL',
-            status: 'ACTIVE',
-            timestamp: DateTime.now(),
-          );
+    if (activeEscalations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final escalation = activeEscalations.first;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -920,7 +899,10 @@ class _LiveEscalationBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              _BannerBtn(label: 'View Incident', onTap: () {}),
+              _BannerBtn(
+                label: 'View Incident',
+                onTap: () => context.push('/escalation/active'),
+              ),
               const SizedBox(width: 8),
               _BannerBtn(label: 'Open Panel', isOutline: false, onTap: () {}),
             ],
@@ -1051,28 +1033,17 @@ class _ActivitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayActivities = activities.isNotEmpty
-        ? activities
-        : [
-            Activity(
-              id: '1',
-              title: 'Weapon Detection Alert - Electronics Zone',
-              type: 'sensor',
-              timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-            ),
-            Activity(
-              id: '2',
-              title: 'Security Report Sent - Monthly Summary',
-              type: 'report',
-              timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-            ),
-            Activity(
-              id: '3',
-              title: 'Incident INC-002 assigned to LP Manager',
-              type: 'security',
-              timestamp: DateTime.now().subtract(const Duration(minutes: 8)),
-            ),
-          ];
+    if (activities.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        alignment: Alignment.center,
+        child: const Text(
+          'No Recent Activity',
+          style: TextStyle(color: Colors.black26),
+        ),
+      );
+    }
 
     return Container(
       width: double.infinity,
@@ -1090,7 +1061,7 @@ class _ActivitySection extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: displayActivities
+        children: activities
             .take(5)
             .map((a) => _ActivityItem(activity: a))
             .toList(),

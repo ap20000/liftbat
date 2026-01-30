@@ -13,6 +13,8 @@ import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/tasks/presentation/pages/tasks_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/more/presentation/pages/more_page.dart';
+import '../../features/escalation/presentation/pages/active_escalation_page.dart';
+import '../../features/escalation/presentation/pages/manual_escalation_page.dart';
 import '../widgets/main_layout.dart';
 
 class AppRouter {
@@ -75,6 +77,14 @@ class AppRouter {
           ),
           GoRoute(path: '/more', builder: (context, state) => const MorePage()),
         ],
+      ),
+      GoRoute(
+        path: '/escalation/active',
+        builder: (context, state) => const ActiveEscalationPage(),
+      ),
+      GoRoute(
+        path: '/escalation/manual',
+        builder: (context, state) => const ManualEscalationPage(),
       ),
     ],
   );
